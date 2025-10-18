@@ -16,3 +16,10 @@ variable "instance_type" {
 
 variable "github_owner" { type = string } # e.g., "gabriel-ejiro"
 variable "github_repo"  { type = string } # e.g., "container-platform"
+
+cd infra
+terraform init
+terraform apply -auto-approve \
+  -var github_owner="YOUR_GH_USER" \
+  -var github_repo="YOUR_REPO_NAME"
+
