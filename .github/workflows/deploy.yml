@@ -1,0 +1,67 @@
+name: Deploy to ECS
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write   # for OIDC
+  contents: read
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPO_NAME: demo-web
+  ECS_CLUSTER: demo-ecs-cluster
+  ECS_SERVICE: demo-web-svc
+  TASKDEF_PATH: deploy/taskdef.json
+  CONTAINER_NAME: demo-web
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        run: |
+          IMAGE_URI=${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:${{ github.sha }}
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -t "$IMAGE_URI" ./app
+
+      - name: Push image
+        run: docker push "$IMAGE_URI"
+
+      - name: Render task definition
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.TASKDEF_PATH }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ env.IMAGE_URI }}
+
+      - name: Register new task definition
+        id: register
+        run: |
+          NEW_TD_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://${{ steps.render.outputs.task-definition }} \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "NEW_TD_ARN=$NEW_TD_ARN" >> $GITHUB_ENV
+
+      - name: Update service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --task-definition "$NEW_TD_ARN" \
+            --force-new-deployment
