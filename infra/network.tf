@@ -2,12 +2,12 @@ resource "aws_vpc" "main" {
   cidr_block           = "10.10.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = { Name = "${var.project_name}-vpc" }
+  tags                 = { Name = "${var.project_name}-vpc" }
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
-  tags = { Name = "${var.project_name}-igw" }
+  tags   = { Name = "${var.project_name}-igw" }
 }
 
 resource "aws_subnet" "public_a" {
@@ -15,7 +15,7 @@ resource "aws_subnet" "public_a" {
   cidr_block              = "10.10.0.0/24"
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.available.names[0]
-  tags = { Name = "${var.project_name}-public-a" }
+  tags                    = { Name = "${var.project_name}-public-a" }
 }
 
 resource "aws_subnet" "public_b" {
@@ -23,7 +23,7 @@ resource "aws_subnet" "public_b" {
   cidr_block              = "10.10.1.0/24"
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.available.names[1]
-  tags = { Name = "${var.project_name}-public-b" }
+  tags                    = { Name = "${var.project_name}-public-b" }
 }
 
 data "aws_availability_zones" "available" {}
