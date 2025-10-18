@@ -1,25 +1,12 @@
-variable "region" {
+variable "github_owner" {
   type        = string
-  description = "AWS region"
-  default     = "eu-north-1"
+  description = "GitHub username for OIDC trust"
+  default     = "gabriel-ejiro"
 }
 
-variable "project_name" {
+variable "github_repo" {
   type        = string
-  default     = "demo"
+  description = "GitHub repository name for OIDC trust"
+  default     = "container-platform-AWS"
 }
-
-variable "instance_type" {
-  type        = string
-  default     = "t3.micro" # or t2.micro
-}
-
-variable "github_owner" { type = string } # e.g., "gabriel-ejiro"
-variable "github_repo"  { type = string } # e.g., "container-platform"
-
-cd infra
-terraform init
-terraform apply -auto-approve \
-  -var github_owner="YOUR_GH_USER" \
-  -var github_repo="YOUR_REPO_NAME"
 
