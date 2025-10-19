@@ -18,24 +18,27 @@
 
 ```mermaid
 flowchart TD
-  Dev[Developer pushes to main] --> CI[GitHub Actions]
-  CI -->|OIDC AssumeRole| IAM[(IAM Role: demo-gh-deploy)]
-  CI --> ECR[ECR (demo-web)]
-  CI --> TD[Register Task Definition]
-  TD --> ECSService[ECS Service: demo-web-svc]
+  Dev["Developer pushes to main"] --> CI["GitHub Actions"]
+  CI --> IAM["IAM role demo-gh-deploy"]
+  CI --> ECR["ECR repo demo-web"]
+  CI --> TD["Register task definition"]
+  TD --> ECSService["ECS service demo-web-svc"]
 
   subgraph AWS
-    ALB[Application Load Balancer :80]
-    ECSCluster[ECS Cluster (EC2)]
-    ASG[AutoScaling Group: 1 x t3.micro]
-    EC2[EC2 host with ECS agent]
-    Task[Task: demo-web container (port 3000)]
-    CW[CloudWatch Logs & Metrics]
+    ALB["Application Load Balancer port 80"]
+    ECSCluster["ECS cluster EC2"]
+    ASG["Auto Scaling Group 1 x t3.micro"]
+    EC2["EC2 host with ECS agent"]
+    Task["Task demo-web port 3000"]
+    CW["CloudWatch logs and metrics"]
   end
 
   ECR --> ECSService
   ECSService --> ECSCluster
-  ECSCluster --> ASG --> EC2 --> Task
-  Task -->|target| ALB
+  ECSCluster --> ASG
+  ASG --> EC2
+  EC2 --> Task
+  Task --> ALB
   Task --> CW
-  User[User] --> ALB
+  User["User"] --> ALB
+```
