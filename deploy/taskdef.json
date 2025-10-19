@@ -4,8 +4,8 @@
   "cpu": "256",
   "memory": "512",
   "requiresCompatibilities": ["EC2"],
-  "executionRoleArn": "REPLACE_ME_EXEC_ROLE_ARN",
-  "taskRoleArn": "REPLACE_ME_TASK_ROLE_ARN",
+  "executionRoleArn": "arn:aws:iam::872926860633:role/demo-ecs-task-exec",
+  "taskRoleArn": "arn:aws:iam::872926860633:role/demo-ecs-task-role",
   "containerDefinitions": [
     {
       "name": "demo-web",
@@ -18,7 +18,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/demo-web",
-          "awslogs-region": "REPLACE_ME_REGION",
+          "awslogs-region": "eu-north-1",
           "awslogs-stream-prefix": "ecs"
         }
       },
