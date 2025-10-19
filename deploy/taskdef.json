@@ -11,7 +11,7 @@
       "name": "demo-web",
       "image": "public.ecr.aws/nginx/nginx:alpine",
       "portMappings": [
-        { "containerPort": 3000, "hostPort": 0, "protocol": "tcp" }
+        { "containerPort": 3000, "hostPort": 3000, "protocol": "tcp" }
       ],
       "essential": true,
       "logConfiguration": {
