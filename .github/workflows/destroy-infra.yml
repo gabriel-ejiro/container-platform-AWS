@@ -1,0 +1,36 @@
+name: Destroy Terraform Infrastructure
+
+on:
+  workflow_dispatch:  # This allows you to run it manually from GitHub Actions UI
+
+jobs:
+  terraform-destroy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write   # Required for OIDC auth to AWS
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::872926860633:role/demo-gh-deploy   # change if different
+          aws-region: eu-north-1
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform Destroy
+        working-directory: infra
+        run: |
+          terraform destroy -auto-approve \
+            -var github_owner="gabriel-ejiro" \
+            -var github_repo="container-platform-AWS"
